@@ -1,5 +1,7 @@
 #! /bin/bash
 
+set -e
+
 # We want to work with the Lightricks dev account, not production.
 export AWS_PROFILE=dev
 
@@ -7,17 +9,22 @@ export AWS_PROFILE=dev
 # will be easier identify our changes.
 export AWS_DEFAULT_REGION=eu-west-1
 
+# This is where we upload the code for our function. It must exist before we upload and in the same
+# region that the lambda function exists in.
+s3_code_bucket="lightricks-staging-lambda-code-eu-west-1"
+
 echo "-- Package code and upload"
 aws cloudformation package \
   --template-file sam-template.yaml \
-  --s3-bucket lightricks-staging-lambda-code-eu-west-1 \
+  --s3-bucket $s3_code_bucket \
   --output-template-file .packaged-sam-template.yaml
 
 echo "-- Deploy lambda function"
 aws cloudformation deploy \
   --template-file .packaged-sam-template.yaml \
   --stack-name my-first-lambda \
-  --capabilities CAPABILITY_IAM
+  --capabilities CAPABILITY_IAM \
+  --no-fail-on-empty-changeset
 
 url=$(
   aws cloudformation describe-stacks \

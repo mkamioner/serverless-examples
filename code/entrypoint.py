@@ -2,13 +2,26 @@
 
 import json
 
+ASIAN_COUNTRIES = {"CN", "JP"}
+
 def handler(event, context):
     print(json.dumps(event))
-    print(context)
 
     query_parameters = event.get("queryStringParameters") or {}
-    name = query_parameters.get("name", "N/A")
+    country = query_parameters.get("country", "N/A")
+
+    products = ["Yearly1", "Monthly1", "OTP1"]
+
+    if country in ASIAN_COUNTRIES:
+        products = ["Yearly2", "Monthly2", "OTP2"]
+
+    body = {
+        "products": products
+    }
 
     return {
-        "body": "Hi %s! Welcome to the cloud" % name,
+        "body": json.dumps(body),
+        "headers": {
+            "content-type": "application/json"
+        }
     }
