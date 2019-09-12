@@ -1,0 +1,29 @@
+# Copyright (c) 2019 Lightricks. All rights reserved.
+
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: A template for serverless applications.
+
+Resources:
+  MyFirstLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: example-lambda-function
+      Handler: entrypoint.handler
+      Runtime: python3.7
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      MemorySize: 128
+      Timeout: 300
+      CodeUri: ./code
+      Events:
+        RestValidApiGatewayEvent:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /
+
+Outputs:
+  Url:
+    Description: The URL to run this function
+    Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${ServerlessRestApiProdStage}
